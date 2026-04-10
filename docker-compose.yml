@@ -1,0 +1,34 @@
+version: "3.8"
+
+services:
+  backend:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - GEMINI_API_KEY=AIzaSyBYezvFKd5akWGlicYt6Q-R8NTe0VVxnhE
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - vulnnet
+
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "1234"
+      POSTGRES_DB: vulnshield
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - vulnnet
+
+networks:
+  vulnnet:
+    driver: bridge
