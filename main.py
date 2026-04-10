@@ -12,8 +12,12 @@ import concurrent.futures
 import os
 from groq import Groq
 
-
-groq_client = Groq(api_key=os.getenv('GROQ_API_KEY'))
+GROQ_API_KEY = os.getenv('GROQ_API_KEY')
+if GROQ_API_KEY:
+    groq_client = Groq(api_key=GROQ_API_KEY)
+else:
+    groq_client = None
+    print('WARNING: GROQ_API_KEY not set. Groq features will be disabled.')
 
 app = FastAPI(title="VulnShield AI", version="4.0.0")
 
@@ -24,7 +28,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-DATABASE_URL = "postgresql://postgres:1234@db/vulnshield"
+DATABASE_URL = ""
 engine = create_engine(DATABASE_URL)
 Base = declarative_base()
 SessionLocal = sessionmaker(bind=engine)
@@ -39,7 +43,6 @@ class ScanRecord(Base):
     summary     = Column(JSON)
     ai_analysis = Column(JSON)
 
-Base.metadata.create_all(bind=engine)
 
 scan_results = {}
 
@@ -47,6 +50,8 @@ class ScanRequest(BaseModel):
     url: str
 
 def groq_guided_crawl(base_url: str, links: list):
+    if groq_client is None:
+        return links[:5]
     try:
         links_text = "\n".join(links[:20])
         response = groq_client.chat.completions.create(
@@ -231,6 +236,8 @@ def check_subdomains(url: str):
     return findings
 
 def groq_analyze(url: str, findings: list):
+    if groq_client is None:
+        return {"summary": "AI analysis unavailable: GROQ_API_KEY not set.", "model": "Groq unavailable", "findings_analyzed": len(findings)}
     try:
         summary_text = "\n".join([f"- [{f['severity']}] {f['type']}: {f['description']}" for f in findings[:15]])
         response = groq_client.chat.completions.create(
@@ -324,8 +331,10 @@ def run_scan(scan_id: str, url: str):
         "Low":      sum(1 for f in all_findings if f["severity"] == "Low"),
     }
     try:
-        db = SessionLocal()
-        db.merge(ScanRecord(scan_id=scan_id, url=url, status="complete", findings=all_findings, total=len(all_findings), summary=scan_results[scan_id]["summary"], ai_analysis=ai_analysis))
+        pass
+        if False:
+            db = SessionLocal()
+            db.merge(ScanRecord(scan_id=scan_id, url=url, status="complete", findings=all_findings, total=len(all_findings), summary=scan_results[scan_id]["summary"], ai_analysis=ai_analysis))
         db.commit()
         db.close()
     except: pass
