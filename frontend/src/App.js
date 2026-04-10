@@ -79,7 +79,7 @@ export default function App() {
     setScanPhase(phases[0]);
 
     try {
-      const res = await fetch("http://localhost:8000/scan", {
+      const res = await fetch("https://vulnshield-backend.onrender.com", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url }),
