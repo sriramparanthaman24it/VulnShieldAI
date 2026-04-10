@@ -11,6 +11,7 @@ import ssl
 import concurrent.futures
 from groq import Groq
 
+
 groq_client = Groq(api_key=GROQ_API_KEY)
 
 app = FastAPI(title="VulnShield AI", version="4.0.0")
