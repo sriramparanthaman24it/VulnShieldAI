@@ -332,6 +332,6 @@ This project is licensed under the MIT License — see the [LICENSE](LICENSE) fi
 ---
 
 <div align="center">
-  <strong>Built with ❤️ for Hackathon</strong><br/>
+  <strong>Built with for Hackathon</strong><br/>
   VulnShield AI — Scan. Detect. Neutralize.
 </div>
