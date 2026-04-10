@@ -79,7 +79,7 @@ export default function App() {
     setScanPhase(phases[0]);
 
     try {
-      const res = await fetch("https://vulnshield-backend.onrender.com", {
+      const res = await fetch("https://vulnshield-backend.onrender.com/scan", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url }),
@@ -93,7 +93,7 @@ export default function App() {
         setProgress(p);
         setScanPhase(phases[Math.floor((p / 100) * phases.length)] || phases[phases.length - 1]);
 
-        const r = await fetch(`http://localhost:8000/results/${scan_id}`);
+        const r = await fetch(`https://vulnshield-backend.onrender.com/results/${scan_id}`);
         const data = await r.json();
         if (data.status === "complete") {
           clearInterval(poll);
