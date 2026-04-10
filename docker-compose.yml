@@ -7,6 +7,7 @@ services:
       - "8000:8000"
     environment:
       - GEMINI_API_KEY=AIzaSyBYezvFKd5akWGlicYt6Q-R8NTe0VVxnhE
+      - GROQ_API_KEY=${GROQ_API_KEY}
     depends_on:
       db:
         condition: service_healthy
